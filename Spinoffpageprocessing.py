@@ -40,9 +40,9 @@ listExtract = os.listdir(EXTRACT)    #Get the extraction of the data tables in t
 listConfig = os.listdir(CONFIG) #Get the list config file from the system 
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-output = PdfFileWriter() #drv8428e
-input1 = PdfFileReader(open(PATHMAIN+"/"+"drv8428e.pdf", "rb"))  #using oslist dir readding the file and extract all the value in the loop 
-inputcomp = "drv8428e" # Get the component input data 
+output = PdfFileWriter() #drv8428e #tps62750
+input1 = PdfFileReader(open(PATHMAIN+"/"+"tps62750.pdf", "rb"))  #using oslist dir readding the file and extract all the value in the loop 
+inputcomp = "tps62750" # Get the component input data 
 Pathdata = EXTRACT+"/"+str(inputcomp)
 # Pins search continued function for long range pins configurection 
 searchpinsconfiguretion = "Pin Configuration and Functions"
@@ -116,6 +116,7 @@ reconnex = {}
 SequenceMax = {}
 NewKeypins = []
 DictionaryPinsdata2 = {}
+NewdictPinsdata = {}
 refsortindex = []
 Packafuldata = [] #Getting the packful data for the 
 recordheader = {} #Recording the header file into the csv for writing the condition 
@@ -1113,6 +1114,7 @@ def Checkinginsidedirectory(inputcomp):
 def Select_package_library(Packageinput,packagename,vav2_sorting,listConfig):  
   #Adding path
   print("Activate select package function")
+  print("Confirm package data",Packageinput,packagename)
   tree = ET.parse(str(Packageinput)+".lbr")  #Loading the lbr file from the package recheck from the OS python library  
   root = tree.getroot()   
   print(ET.tostring(root, encoding='utf8', method='xml')) #Getting the xml utf code included    
@@ -1169,7 +1171,11 @@ def Select_package_library(Packageinput,packagename,vav2_sorting,listConfig):
                                                                                 print(pin.attrib)
                                                                                 positionrecall = pinsclarify.index(pin) #Getting the position feedback from the loop 
                                                                                 print("Position of the array:",positionrecall)  #Getting the positon to call the list name index of the pins to edit in the loop    
-                                                                                pin.set('name',NewPinsNamesorted[positionrecall]) 
+                                                                                print(NewPinsNamesorted)
+                                                                                if NewPinsNamesorted != []:
+                                                                                   pin.set('name',NewPinsNamesorted[positionrecall])
+                                                                                else:
+                                                                                   print("New pins sorted blank find the cause of the error")    
                                                                    for deviceset in drawing.find('library').find('devicesets').iter('deviceset'):
                                                                                 #print("Found devicesets found")
                                                                                 print(deviceset.attrib)
@@ -1185,6 +1191,8 @@ def Select_package_library(Packageinput,packagename,vav2_sorting,listConfig):
                                                                              print(vav3_gate[ikl],key3_gate[vav3_gate.index(vav3_gate[ikl])]) #Getting the gate key data output 
                                                                              if vav3_gate[ikl] == '—':
                                                                                     vav3_gate[ikl] = str(ikl+1)
+                                                                             if vav3_gate[ikl] == '-':
+                                                                                    vav3_gate[ikl] = str(ikl+1)       
                                                                    print(vav3_gate)
                                                                    for irl in range(0,len(key3_gate)):
                                                                             Connectsrecord[key3_gate[irl]] = vav3_gate[irl]    #Record the connection pins 
@@ -1221,7 +1229,8 @@ def Generate_package(listConfig,key_val,ik,values_pack,checkintersec):
                                                             #list(PinsPackage.values())[0].remove("".join(checkintersec))
                                                             if PinsName[0] == "NAME":
                                                                    PinsName.remove("NAME")
-                                                           
+                                                            if PinsName[0] == "NO.":
+                                                                   PinsName.remove("NO.")
                                                             #if "-" in list(PinsPackage.values())[0]:
                                                             #       list(PinsPackage.values())[0].remove("-") #remove - from the list because not found the pins data from the list
                                                             print("Found the package",list(PinsPackage.values())[0]) #Getting the list to edit the xml from the concerning package data 
@@ -1485,15 +1494,6 @@ def Packagefor_3dlibclass(input1,inputcomp,listConfig):
                                                                           sortingpins += [sortingpins.pop(sortingpins.index(sortingpins[redd]))]  #Getting the index input from detected position index list
                                                              print("moved permute data",sortingpins) #Getting the moved data 
                                                              #Sorting list converting into the dictionary 
-                                                             """
-                                                             for ert in range(0,len(sortingpins)):
-                                                                   if sortingpins[ert] != '-':  
-                                                                         refsortindex.append(int(sortingpins[ert])) 
-                                                                   #refsortindex.append(int(sortingpins.index(sortingpins[ert]))) #Getting the sorting referent index 
-                                                             print("Reference sorting int",refsortindex)
-                                                             refsorting = sorted(refsortindex,reverse=False)
-                                                             print("Ref sorting:",refsorting) #Getting the reference sorting index 
-                                                             """
                                                              for ikr in range(0,len(sortingpins)):
                                                                         print(key3_sorting[vav3_sorting.index(sortingpins[ikr])])
                                                                         NewKeypins.append(key3_sorting[vav3_sorting.index(sortingpins[ikr])])   #Getting the new keypins for sorting the key data 
@@ -1501,8 +1501,39 @@ def Packagefor_3dlibclass(input1,inputcomp,listConfig):
                                                              print(NewKeypins)
                                                              for rkl in range(0,len(NewKeypins)):
                                                                        DictionaryPinsdata2[NewKeypins[rkl]] = sortingpins[rkl]
-                                                             print("New pins dictionary data",DictionaryPinsdata2)                  
-                                                                         
+                                                             print("New pins dictionary data",DictionaryPinsdata2)      
+                                                             #Sorting data of the 
+                                                             key_sortset = list(DictionaryPinsdata2.keys())
+                                                             vav_sortset = list(DictionaryPinsdata2.values())
+                                                             print("Get ",vav_sortset)
+                                                             for ikr in range(0,len(vav_sortset)):
+                                                                    if key_sortset[ikr] != "PAD":
+                                                                       refsortindex.append(int(vav_sortset[ikr])) 
+                                                                    if key_sortset[ikr] == "PAD":
+                                                                       refsortindex.append(int(ikr)+1) #Getting the PAD   
+                                                             print("Ref sorting value:",refsortindex) #Getting the reference sorting index value          
+                                                             #Sorting index data of the pins before adding into the select package and pins configuretion part 
+                                                             sorting = sorted(refsortindex,reverse=False)
+                                                             print(sorting) #Getting the sorting index of the new list path 
+                                                             for ikl in range(0,len(key_sortset)):
+                                                                  if key_sortset[ikl] != "PAD":   
+                                                                      print(key_sortset[vav_sortset.index(str(sorting[ikl]))])  #Getting new key sorting 
+                                                                      NewdictPinsdata[key_sortset[vav_sortset.index(str(sorting[ikl]))]] = str(sorting[ikl])
+                                                               
+                                                             NewdictPinsdata["PAD"] =  "-"              
+                                                             print("New dictpins sorted list:",NewdictPinsdata) #Getting the sorted list dictionarys 
+                                                             vav2_sortset = list(NewdictPinsdata.values()) #Getting new value input for the select package                               
+                                                             key2_sortset = list(NewdictPinsdata.values())
+                                                             for irl in range(0,len(key2_sortset)):
+                                                                    NewPinsNamesorted.append(key2_sortset[irl]) #Adding the sortset of the key data
+                                                             print(NewPinsNamesorted)
+                                                             print(list(Packageorder)[len(list(Packageorder))-1],Packagedata)
+                                                             
+                                                             try:
+                                                                  Select_package_library(Packagedata,list(Packageorder)[len(list(Packageorder))-1],vav2_sortset,listConfig) #Select package data
+                                                             except:
+                                                                 print("Not found the config file")
+                                                                               
                        Orderableoackage = transfer.get("Orderablepackage").get("Orderable") #Getting the package data from the search intersection                  
                        checkpackage = intersection(Orderableoackage,listheader)
                        if checkpackage !=[]: 
@@ -1545,8 +1576,11 @@ def Packagefor_3dlibclass(input1,inputcomp,listConfig):
                                                     print(checkintersec)
                                                     duplicate = set([x for x in checkintersec if checkintersec.count(x) > 1])
                                                     print(list(duplicate))
-                                                    checkintersec.remove(list(duplicate)[0])
-                                                    print("Start checking intersect",checkintersec)
+                                                    try:
+                                                      checkintersec.remove(list(duplicate)[0])
+                                                      print("Start checking intersect",checkintersec)
+                                                    except:
+                                                        print("Single root detected")
                                                     #"""
                                                     print("Check intersect 1",Packagedrawing[len(Packagedrawing)-1]) #Checking the package drawing list
                                                     print("Joining list check","".join(checkintersec)) #Checking the joining list 
