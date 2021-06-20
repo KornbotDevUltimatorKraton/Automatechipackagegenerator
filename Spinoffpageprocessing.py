@@ -1167,6 +1167,7 @@ def Select_package_library(Packageinput,packagename,vav2_sorting,listConfig):
                                                                             #one time record process for the pins address 
                                                                             #pin.set('name','testing')  #Getting the data index input from the pdf extraction 
                                                                    print(pinsclarify) #Getting the pins clarify 
+
                                                                    for pin in drawing.find('library').find('symbols').iter('pin'):
                                                                                 print(pin.attrib)
                                                                                 positionrecall = pinsclarify.index(pin) #Getting the position feedback from the loop 
@@ -1224,55 +1225,7 @@ def Select_package_library(Packageinput,packagename,vav2_sorting,listConfig):
                                            
                             for package in root.iter('package3d'):
                                       print(package.attrib)
-def Generate_package(listConfig,key_val,ik,values_pack,checkintersec): 
-                                                            print("Getting drawing package process....")
-                                                            #list(PinsPackage.values())[0].remove("".join(checkintersec))
-                                                            if PinsName[0] == "NAME":
-                                                                   PinsName.remove("NAME")
-                                                            if PinsName[0] == "NO.":
-                                                                   PinsName.remove("NO.")
-                                                            #if "-" in list(PinsPackage.values())[0]:
-                                                            #       list(PinsPackage.values())[0].remove("-") #remove - from the list because not found the pins data from the list
-                                                            print("Found the package",list(PinsPackage.values())[0]) #Getting the list to edit the xml from the concerning package data 
-                                                            
-                                                            print("Pins name",PinsName)
-                                                            for il in range(0,len(PinsName)):
-                                                                      DictionaryPinsdata[str(PinsName[il])] = list(PinsPackage.values())[0][il] 
-                                                            print("Marking dictionary data",DictionaryPinsdata)
-                                                            #Sorting process begin here 
-                                                            key_dictpins = list(DictionaryPinsdata.keys())
-                                                            values_dictpins = list(DictionaryPinsdata.values())
-                                                            for ril in range(0,len(list(DictionaryPinsdata))):
-                                                                   #print(key_dictpins[ril])
-                                                                   if key_dictpins[ril] != "PAD":
-                                                                             vavcheck = DictionaryPinsdata.get(key_dictpins[ril])
-                                                                             if vavcheck == "—": 
-                                                                                    print(key_dictpins[ril])
-                                                                                    del DictionaryPinsdata[key_dictpins[ril]] #Delete unwanted key and value from the dictionary list 
-                                                                   #remove the nan from the list 
-                                                                   if key_dictpins[ril] == 'nan':
-                                                                       print(key_dictpins[ril])
-                                                                       del key_dictpins['nan']
-                                                            print("ready data for sorting",DictionaryPinsdata)
-                                                           
-                                                            vav2_sorting = list(DictionaryPinsdata.values())
-                                                            key2_sorting = list(DictionaryPinsdata.keys())
-                                                            print("Removed nan",DictionaryPinsdata)
-                                                            sortingpins = sorted(vav2_sorting,reverse=False)
-                                                            print(sortingpins)
-                                                            for rik in range(0,len(sortingpins)):
-                                                               
-                                                                      print(key2_sorting[vav2_sorting.index(sortingpins[rik])],sortingpins[rik])
-                                                                      NewPinsNamesorted.append(key2_sorting[vav2_sorting.index(sortingpins[rik])]) #Getting the list of the name for input into the select pins package function 
-                                                            print(NewPinsNamesorted) #Getting the pins mame to input into the select package function
-                                                            #Package selection for editing data 
-                                                            #function here 
-                                                            try:
-                                                                                                      #Name package input at the key_val[ik]
-                                                               Select_package_library(values_pack[ik],key_val[ik],vav2_sorting,listConfig) #Select the package for editing the pins data
-                                                                
-                                                            except: 
-                                                                print("Not found any package in the list")  
+
 def Packagefor_3dlibclass(input1,inputcomp,listConfig):
        print("Package for 3d libraly class for editing selection")
        for i in reversed(range(0,input1.getNumPages())):  # Running the page for the back checking 
@@ -1427,27 +1380,41 @@ def Packagefor_3dlibclass(input1,inputcomp,listConfig):
                                        
                                        print("Package order",Packageorder) #Getting the list of the package order for the device have morethan 1 package data
                                        
-                                       
-                                       for ij in range(0,len(Deviceindexheader)): #Getting the device name pack combine with drawing package for search package  
-                                                 DevicenamePackful  = Deviceindexheader[ij] +list(Packageorder.values())[ij].split(",")[1] 
-                                                 #rearrangedata =  list(DevicenamePackful),list(list(Packageorder.keys())[ij])
-                                                 #print(DevicenamePackful,rearrangedata)
-                                                 print("Device name and package combine",DevicenamePackful)
-                                                 Packafuldata.append(DevicenamePackful) #Getting the device name and package combine
+                                       if Deviceindexheader[0] != "NO.":
+                                           for ij in range(0,len(Deviceindexheader)): #Getting the device name pack combine with drawing package for search package  
+                                                 if Deviceindexheader[ij] != "NO.":
+                                                           DevicenamePackful  =  Deviceindexheader[ij] +list(Packageorder.values())[ij].split(",")[1] 
+                                                           #rearrangedata =  list(DevicenamePackful),list(list(Packageorder.keys())[ij])
+                                                           #print(DevicenamePackful,rearrangedata)
+                                                           print("Device name and package combine",DevicenamePackful)
+                                                           Packafuldata.append(DevicenamePackful) #Getting the device name and package combine
+                                                 if Deviceindexheader[ij] == "NO.":
+                                                           DevicenamePackful  = list(Packageorder.values())[ij].split(",")[1] 
+                                                           #rearrangedata =  list(DevicenamePackful),list(list(Packageorder.keys())[ij])
+                                                           #print(DevicenamePackful,rearrangedata)
+                                                           print("Device name and package combine",DevicenamePackful)
+                                                           Packafuldata.append(DevicenamePackful) #Getting the device name and package combine
+                                       if Deviceindexheader[0] == "NO.":
+                                                   print("Found NO. next processing packfuldata for append the package device into it") 
+                                                   
                                        print("Getting list name and package combination:",Packafuldata)
                                        print("Pinsname:",PinsName) 
                                        print("Pins package",PinsPackage)
                                        #This section of code will extract the package from the dicitonary file by classifying the name and package drawing from the device from the intersection 
-                                       for ikl in range(0,len(list(Packageorder))):
+                                       print("Checking packfull",list(Packafuldata))
+                                       print("Checking packorder",list(Packageorder))
+                                       if list(Packafuldata) and list(Packageorder) != []:    
+                                           for ikl in range(0,len(list(Packageorder))):
                                                 
-                                             checkingintersect =  intersection(list(Packafuldata[ikl]),list(list(Packageorder)[ikl])) #Getting the package order intersection
-                                             print(checkingintersect,list(Packageorder)[ikl]) #Checking the list intersection function   
-                                             percent = difflib.SequenceMatcher(None,list(Packafuldata[ikl]),list(list(Packageorder)[ikl]))
-                                             print("Checking matching sequence possibility",list(Packageorder)[ikl],percent.ratio()*100,"%") #Checking the package match sequence from the maximum possibility matching 
-                                             SequenceMax[percent.ratio()*100] = list(Packageorder)[ikl] 
-                                       print(SequenceMax)
-                                       print("Maximum from the list",max(list(SequenceMax)))
-                                       for ikl in range(0,len(list(Packageorder))):
+                                                checkingintersect =  intersection(list(Packafuldata[ikl]),list(list(Packageorder)[ikl])) #Getting the package order intersection
+                                                print(checkingintersect,list(Packageorder)[ikl]) #Checking the list intersection function   
+                                                percent = difflib.SequenceMatcher(None,list(Packafuldata[ikl]),list(list(Packageorder)[ikl]))
+                                                print("Checking matching sequence possibility",list(Packageorder)[ikl],percent.ratio()*100,"%") #Checking the package match sequence from the maximum possibility matching 
+                                                SequenceMax[percent.ratio()*100] = list(Packageorder)[ikl] 
+                                           print(SequenceMax)
+                                           print("Maximum from the list",max(list(SequenceMax)))
+                                      
+                                           for ikl in range(0,len(list(Packageorder))):
                                                 
                                              checkingintersect =  intersection(list(Packafuldata[ikl]),list(list(Packageorder)[ikl])) #Getting the package order intersection
                                              print(checkingintersect,list(Packageorder)[ikl]) #Checking the list intersection function   
@@ -1522,18 +1489,55 @@ def Packagefor_3dlibclass(input1,inputcomp,listConfig):
                                                                
                                                              NewdictPinsdata["PAD"] =  "-"              
                                                              print("New dictpins sorted list:",NewdictPinsdata) #Getting the sorted list dictionarys 
-                                                             vav2_sortset = list(NewdictPinsdata.values()) #Getting new value input for the select package                               
-                                                             key2_sortset = list(NewdictPinsdata.values())
+                                                             vav2_sortset = list(NewdictPinsdata.values()) #Getting new value input for the select package 
+                                                             key2_sortset = list(NewdictPinsdata.keys())
+                                                             print("Sort set data:",vav2_sortset)
                                                              for irl in range(0,len(key2_sortset)):
-                                                                    NewPinsNamesorted.append(key2_sortset[irl]) #Adding the sortset of the key data
-                                                             print(NewPinsNamesorted)
+                                                                    NewPinsNamesorted.append(key2_sortset[irl]) #Adding the sortset of Newpins sorted
                                                              print(list(Packageorder)[len(list(Packageorder))-1],Packagedata)
-                                                             
                                                              try:
                                                                   Select_package_library(Packagedata,list(Packageorder)[len(list(Packageorder))-1],vav2_sortset,listConfig) #Select package data
                                                              except:
                                                                  print("Not found the config file")
-                                                                               
+                       #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>..
+                          #Activate this function when working on the single type of the chip with no difference type of chip package or pins 
+                     
+                       if listrecorder[il] == listrecorder[len(listrecorder)-1]:
+                          vav_Detectnum = list(PinsPackage.values())
+                          print(PinsName,vav_Detectnum[0][0]) #Top header of the data table extraction from the list    
+                          
+                          if checkpackage  == []:
+                              if vav_Detectnum[0][0] == "NO.":
+                                  print("Found NO. select new classification operation") 
+                                  #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.
+                                  #Input the new task here for the package classification                                         
+                                  #First getting the package order value and getting the package name no need to select the flassification with NO. mode 
+                                  print(Packageorder) #Getting the package order value 
+                                  vav_packorder = list(Packageorder.values()) #Getting the values package order 
+                                  
+                                  for iwl in range(0,len(list(Packageorder))): 
+                                      print(list(Packageorder)[iwl], vav_packorder[iwl].split(",")[0], vav_packorder[iwl].split(",")[1]) #Getting the package keyname of the devices 
+                                      print("Starting select package:",list(Packageorder)[iwl],iwl+1)
+                                      print("Extracting package:",Packageorder.get(list(Packageorder)[iwl])) #Getting the value index from the input key data
+                                      Packagedata = Packageorder.get(list(Packageorder)[iwl]).split(",")[0]
+                                  print("Package data:",Packagedata) #Getting the package data 
+                                  if PinsName[0] == "NAME":
+                                             PinsName.remove("NAME")
+                                  if vav_Detectnum[0][0] == "NO.":
+                                            vav_Detectnum[0].remove("NO.")           
+                                  print("Remove name:", PinsName)
+                                  print("Remove NO.:",vav_Detectnum[0])
+                                  print(DictionaryPinsdata)
+                                  for irl in range(0,len(PinsName)):
+                                           DictionaryPinsdata[PinsName[irl]] = vav_Detectnum[0][irl]
+                                  print("Dictionary pins:",DictionaryPinsdata) 
+                                  vav_newdict = list(DictionaryPinsdata.values()) #Getting the values of new generated dictionary
+                                  
+                                  try:
+                                       Select_package_library(Packagedata,list(Packageorder)[len(list(Packageorder))-1],vav_newdict,listConfig) #Select package data
+                                  except:
+                                       print("Not found the config file")
+                                      
                        Orderableoackage = transfer.get("Orderablepackage").get("Orderable") #Getting the package data from the search intersection                  
                        checkpackage = intersection(Orderableoackage,listheader)
                        if checkpackage !=[]: 
@@ -1564,29 +1568,26 @@ def Packagefor_3dlibclass(input1,inputcomp,listConfig):
                                        Packagedevice[str(listnamepackage[0])] = listnamepackage[2] #Getting the package and the value of the devices 
                                        print("Map package list info",Packagedevice,"Total package",len(Packagedevice)) #Getting the data of the package device 
                                        key_val = list(Packagedevice.keys())
-                                       print(key_val)
+                                       print("Package name",key_val)
                                        values_pack = list(Packagedevice.values())
-                                       print(values_pack)
+                                       print("Values package:",values_pack)
                                        for ik in range(0,len(key_val)):
                                                if len(key_val) <= 1:
                                                     print("Getting name:",key_val[ik])
                                                     print("Getting package type:",values_pack[ik]) 
                                                     print(Packagedrawing[len(Packagedrawing)-1])
                                                     checkintersec = intersection(list(key_val[ik]),list(Packagedrawing[len(Packagedrawing)-1]))
-                                                    print(checkintersec)
-                                                    duplicate = set([x for x in checkintersec if checkintersec.count(x) > 1])
-                                                    print(list(duplicate))
-                                                    try:
-                                                      checkintersec.remove(list(duplicate)[0])
-                                                      print("Start checking intersect",checkintersec)
-                                                    except:
-                                                        print("Single root detected")
+                                                    if checkintersec != []:
+                                                       print(checkintersec)
+                                                       duplicate = set([x for x in checkintersec if checkintersec.count(x) > 1])
+                                                       print(list(duplicate))
+                                                       checkintersec.remove(list(duplicate)[0])
+                                                       print("Start checking intersect",checkintersec)
                                                     #"""
                                                     print("Check intersect 1",Packagedrawing[len(Packagedrawing)-1]) #Checking the package drawing list
                                                     print("Joining list check","".join(checkintersec)) #Checking the joining list 
                                                     print(list(PinsPackage.values())[0])
                                                     print(PinsName)
-                                                    #Generate_package(listConfig, key_val, ik, values_pack, checkintersec) #Generate package functions
                                                     #"""
                                                     #Rechecking this part of code some of them may not working
                                                     if Packagedrawing[len(Packagedrawing)-1] == "".join(checkintersec): # Fix this code 
@@ -1594,7 +1595,7 @@ def Packagefor_3dlibclass(input1,inputcomp,listConfig):
                                                             list(PinsPackage.values())[0].remove("".join(checkintersec))
                                                             if PinsName[0] == "NAME":
                                                                    PinsName.remove("NAME")
-
+                                                            
                                                             #if "-" in list(PinsPackage.values())[0]:
                                                             #       list(PinsPackage.values())[0].remove("-") #remove - from the list because not found the pins data from the list
                                                             print("Found the package",list(PinsPackage.values())[0]) #Getting the list to edit the xml from the concerning package data 
